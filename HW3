@@ -1,0 +1,83 @@
+CREATE TABLE `HairCareProducts` (
+    `ID` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Brand` VARCHAR(50) NOT NULL,
+    `ProductName` VARCHAR(100) NOT NULL,
+    `Category` VARCHAR(50) NOT NULL,
+    `Price` DECIMAL(10, 2) NOT NULL,
+    `Stock` INT NOT NULL
+);
+<?php
+$host = 'localhost';   // Database host
+$dbname = 'beauty_store'; // Database name
+$username = 'root';   // Database username
+$password = '';       // Database password
+
+// Create a connection
+$conn = new mysqli($host, $username, $password, $dbname);
+
+// Check for connection error
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+<?php
+include 'db.php';
+
+// Check if data is provided via POST
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $brand = $_POST['Brand'];
+    $productName = $_POST['ProductName'];
+    $category = $_POST['Category'];
+    $price = $_POST['Price'];
+    $stock = $_POST['Stock'];
+
+    // Insert the new product into the database
+    $sql = "INSERT INTO `HairCareProducts` (`Brand`, `ProductName`, `Category`, `Price`, `Stock`) 
+            VALUES ('$brand', '$productName', '$category', '$price', '$stock')";
+    
+    if ($conn->query($sql) === TRUE) {
+        echo "New product added successfully!";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+?>
+<?php
+include 'db.php';
+
+// Check if an ID is provided, else fetch all products
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $sql = "SELECT * FROM `HairCareProducts` WHERE `ID` = $id";
+} else {
+    $sql = "SELECT * FROM `HairCareProducts`";
+}
+
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        echo "ID: " . $row["ID"]. " - Brand: " . $row["Brand"]. " - Product: " . $row["ProductName"]. 
+             " - Category: " . $row["Category"]. " - Price: $" . $row["Price"]. " - Stock: " . $row["Stock"]. "<br>";
+    }
+} else {
+    echo "0 results";
+}
+?>
+<?php
+include 'db.php';
+
+// Check if an ID is provided
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+
+    // Delete product
+    $sql = "DELETE FROM `HairCareProducts` WHERE `ID` = $id";
+    
+    if ($conn->query($sql) === TRUE) {
+        echo "Product deleted successfully!";
+    } else {
+        echo "Error: " . $conn->error;
+    }
+}
+?>
